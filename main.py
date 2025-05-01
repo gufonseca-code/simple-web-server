@@ -1,7 +1,28 @@
-import requests
+import http.server
 
-response = requests.get("http://aosabook.org/en/500L/web-server/testpage.html")
+class RequestHandler(http.server.BaseHTTPRequestHandler):
+    """
+    Return a page to HTTP requests
+    """
 
-print(f"status code: {response.status_code}")
-print(f"content length: {response.headers["content-length"]}")
-print(response.text)
+    page = """
+<html>
+    <body>
+        <p>Hello World!</p>
+    </body>
+</html>
+"""
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html")
+        self.send_header("Content-Length", str(len(self.page)))
+        self.end_headers()
+        self.wfile.write(self.page.encode())
+
+def main():
+    serverAddress = ("", 8080)
+    server = http.server.HTTPServer(serverAddress, RequestHandler)
+    server.serve_forever()
+
+if __name__ == "__main__":
+    main()
